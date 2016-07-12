@@ -1,6 +1,3 @@
-<<<<<<< HEAD
-lolbot.py
-=======
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]
@@ -89,5 +86,4 @@ ENV/
 .spyderproject
 
 # Rope project settings
->>>>>>> 545bd49efb55bf28e42e42985e41bc0ac2f64afd
 .ropeproject
