@@ -28,7 +28,7 @@ if __name__ == "__main__":
     q = Question()
     print(q.question)
     attempt = input('Answer: ')
-    if attempt.lower() == q.checked_answer.lower():
+    if attempt.lower() in q.checked_answer.lower():
         print('Correct! The answer was {}'.format(q.answer))
     else:
         print('Nope! The answer was {}'.format(q.answer))
