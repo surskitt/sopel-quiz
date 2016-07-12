@@ -15,7 +15,8 @@ class Question():
         self.value = q_json['value']
 
     def get_question(self):
-        return '{} ({}) [{}]'.format(self.question, self.category, self.value)
+        q, c, v = self.question.strip(), self.category, self.value
+        return '{} ({}) [{}]'.format(q, c, v)
 
     def parse_answer(self, answer):
         return answer
