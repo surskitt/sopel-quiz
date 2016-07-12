@@ -1,7 +1,7 @@
 #! /usr/bin/env python
 
 import requests
-# from sopel.modules import commands
+from sopel.module import commands
 import re
 
 
@@ -38,9 +38,16 @@ class Question():
 class Quiz():
     pass
 
+
+@commands('quiz')
+def quiz(bot, trigger):
+    q = Question()
+    bot.say(q.get_question())
+
+
 if __name__ == "__main__":
     q = Question()
-    print(q.question)
+    print(q.get_question())
     attempt = input('Answer: ')
     # if attempt.lower() in q.checked_answer.lower():
     if q.attempt(attempt):
