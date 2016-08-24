@@ -67,17 +67,23 @@ def quiz(bot, trigger):
 
 @commands('qstop')
 def qstop(bot, trigger):
-    pass
+    if not bot.memory['quiz']:
+        bot.say('No quiz running!')
+        pass
 
 
 @commands('qscores')
 def qscores(bot, trigger):
-    pass
+    if not bot.memory['quiz']:
+        bot.say('No quiz running!')
+        pass
 
 
 @commands('qskip')
 def qskip(bot, trigger):
-    pass
+    if not bot.memory['quiz']:
+        bot.say('No quiz running!')
+        pass
 
 
 if __name__ == "__main__":
