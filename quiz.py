@@ -1,7 +1,7 @@
 #! /usr/bin/env python
 
 import requests
-from sopel.module import commands
+from sopel.module import commands, rule
 import re
 
 
@@ -69,21 +69,26 @@ def quiz(bot, trigger):
 def qstop(bot, trigger):
     if not bot.memory['quiz']:
         bot.say('No quiz running!')
-        pass
+        return
 
 
 @commands('qscores')
 def qscores(bot, trigger):
     if not bot.memory['quiz']:
         bot.say('No quiz running!')
-        pass
+        return
 
 
 @commands('qskip')
 def qskip(bot, trigger):
     if not bot.memory['quiz']:
         bot.say('No quiz running!')
-        pass
+        return
+
+
+@rule('[^\.].*')
+def handle_quiz(bot, trigger):
+    return
 
 
 if __name__ == "__main__":
