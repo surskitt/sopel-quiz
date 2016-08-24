@@ -36,13 +36,48 @@ class Question():
 
 
 class Quiz():
+    def __init__(self):
+        self.scores = {}
+        self.qno = 0
+        self.question = None
+
+    def start(self):
+        pass
+
+    def stop(self):
+        pass
+
+    def next_question(self):
+        pass
+
+    def get_scores(self):
+        pass
+
     pass
+
+
+def setup(bot):
+    bot.memory['quiz'] = None
 
 
 @commands('quiz')
 def quiz(bot, trigger):
-    q = Question()
-    bot.say(q.get_question())
+    bot.memory['quiz'] = Quiz()
+
+
+@commands('qstop')
+def qstop(bot, trigger):
+    pass
+
+
+@commands('qscores')
+def qscores(bot, trigger):
+    pass
+
+
+@commands('qskip')
+def qskip(bot, trigger):
+    pass
 
 
 if __name__ == "__main__":
