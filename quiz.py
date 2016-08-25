@@ -85,12 +85,12 @@ def qscores(bot, trigger):
         bot.say('No quiz running!')
         return
 
-    scores = sorted(bot.memory['quiz'].get_scores().items(),
-                    key=lambda x: x[1], reverse=True)
-
-    if not scores:
+    if not bot.memory['quiz'].get_scores():
         bot.say('No one has scored any points yet!')
         return
+
+    scores = sorted(bot.memory['quiz'].get_scores().items(),
+                    key=lambda x: x[1], reverse=True)
 
     bot.say('Current scores:')
     for quizzer, score in scores:
