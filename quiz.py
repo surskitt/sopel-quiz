@@ -53,8 +53,6 @@ class Quiz():
     def get_scores(self):
         pass
 
-    pass
-
 
 def setup(bot):
     bot.memory['quiz'] = None
@@ -62,6 +60,11 @@ def setup(bot):
 
 @commands('quiz')
 def quiz(bot, trigger):
+    if bot.memory['quiz']:
+        bot.say('Quiz is running')
+        return
+
+    bot.say('Quiz started by')
     bot.memory['quiz'] = Quiz()
 
 
@@ -70,6 +73,9 @@ def qstop(bot, trigger):
     if not bot.memory['quiz']:
         bot.say('No quiz running!')
         return
+
+    bot.say('Stopping quiz')
+    bot.memory['quiz'] = None
 
 
 @commands('qscores')
@@ -88,7 +94,8 @@ def qskip(bot, trigger):
 
 @rule('[^\.].*')
 def handle_quiz(bot, trigger):
-    return
+    if not bot.memory['quiz']:
+        return
 
 
 if __name__ == "__main__":
