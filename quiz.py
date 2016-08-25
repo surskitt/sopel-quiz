@@ -61,7 +61,7 @@ def setup(bot):
 @commands('quiz')
 def quiz(bot, trigger):
     if bot.memory['quiz']:
-        bot.say('Quiz is running')
+        bot.say('Quiz is already running')
         return
 
     bot.say('Quiz started by')
