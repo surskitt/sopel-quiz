@@ -48,10 +48,11 @@ class Quiz():
         pass
 
     def next_question(self):
-        pass
+        self.qno += 1
+        self.question = Question()
 
     def get_scores(self):
-        pass
+        return self.scores
 
 
 def setup(bot):
@@ -83,6 +84,18 @@ def qscores(bot, trigger):
     if not bot.memory['quiz']:
         bot.say('No quiz running!')
         return
+
+    scores = sorted(bot.memory['quiz'].get_scores().items(),
+                    key=lambda x: x[1], reverse=True)
+
+    if not scores:
+        bot.say('No one has scored any points yet!')
+        return
+
+    bot.say('Current scores:')
+    for quizzer, score in scores:
+        score = int(score)
+        bot.say('{}: {} point{}'.format(quizzer, score, 's' * (score != 1)))
 
 
 @commands('qskip')
