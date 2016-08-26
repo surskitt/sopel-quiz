@@ -137,22 +137,22 @@ def handle_quiz(bot, trigger):
     quiz = bot.memory['quiz']
     answer = quiz.question.answer
     if quiz.attempt(trigger.args[1], trigger.nick):
-        scores = bot.memory['quiz'].get_scores()
+        score = bot.memory['quiz'].get_scores()[trigger.nick]
 
         bot.say('Correct! The answer was {}'.format(answer))
-        bot.say('{} has {} points!'.format(trigger.nick, scores[trigger.nick]))
+        bot.say('{} has {} point{}!'.format(trigger.nick, score,
+                                            's' * (score != 1)))
 
-        tens = [i for i in scores if scores[i] == 10]
-        if tens:
-            bot.say('{} is the winner!'.format(tens[0]))
+        if score == 10:
+            bot.say('{} is the winner!'.format(trigger.nick))
             qscores(bot, trigger)
             bot.memory['quiz'] = None
+            return
 
         if not quiz.qno % 10:
             qscores(bot, trigger)
 
         bot.say(bot.memory['quiz'].get_question())
-
 
 
 if __name__ == "__main__":
