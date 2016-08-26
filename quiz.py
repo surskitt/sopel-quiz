@@ -28,7 +28,7 @@ class Question():
     def parse_answer(self, answer):
         # strip extraneous characters, making the question easier to answer
         # - a, an and the from the beginning
-        answer = re.sub(r'^(the|a|an) |\<.*?\>', '', answer)
+        answer = re.sub(r'^(the|a|an) |"', '', answer)
         return answer.lower()
 
     def attempt(self, attempt):
@@ -39,17 +39,35 @@ class Quiz():
     def __init__(self):
         self.scores = {}
         self.qno = 0
-        self.question = None
+        # self.question = None
+        self.next_question()
 
-    def start(self):
-        pass
+    # def start(self):
+        # pass
 
     def stop(self):
         pass
 
+    def get_question(self):
+        return 'Question {}: {}'.format(self.qno, self.question.get_question())
+
+    def award_user(self, user):
+        if user not in self.scores:
+            self.scores[user] = 1
+        else:
+            self.scores[user] += 1
+
     def next_question(self):
         self.qno += 1
         self.question = Question()
+
+    def attempt(self, attempt, user):
+        if self.question.attempt(attempt):
+            self.award_user(user)
+            self.next_question()
+            return True
+        else:
+            return False
 
     def get_scores(self):
         return self.scores
@@ -67,6 +85,7 @@ def quiz(bot, trigger):
 
     bot.say('Quiz started by')
     bot.memory['quiz'] = Quiz()
+    bot.say(bot.memory['quiz'].get_question())
 
 
 @commands('qstop')
@@ -104,11 +123,27 @@ def qskip(bot, trigger):
         bot.say('No quiz running!')
         return
 
+    answer = bot.memory['quiz'].question.answer
+    bot.say('Fine, the answer was {}'.format(answer))
+    bot.memory['quiz'].next_question()
+    bot.say(bot.memory['quiz'].get_question())
+
 
 @rule('[^\.].*')
 def handle_quiz(bot, trigger):
     if not bot.memory['quiz']:
         return
+
+    quiz = bot.memory['quiz']
+    answer = quiz.question.answer
+    if quiz.attempt(trigger.args[1], trigger.nick):
+        bot.say('Correct! The answer was {}'.format(answer))
+
+        if not quiz.qno % 10:
+            qscores(bot, trigger)
+
+        bot.say(bot.memory['quiz'].get_question())
+
 
 
 if __name__ == "__main__":
