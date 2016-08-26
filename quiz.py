@@ -139,6 +139,13 @@ def handle_quiz(bot, trigger):
     if quiz.attempt(trigger.args[1], trigger.nick):
         bot.say('Correct! The answer was {}'.format(answer))
 
+        scores = bot.memory['quiz'].get_scores()
+        tens = [i for i in scores if scores[i] == 10]
+        if tens:
+            bot.say('{} is the winner!'.format(tens[0]))
+            qscores(bot, trigger)
+            bot.memory['quiz'] = None
+
         if not quiz.qno % 10:
             qscores(bot, trigger)
 
