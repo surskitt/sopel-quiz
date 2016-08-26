@@ -83,7 +83,7 @@ def quiz(bot, trigger):
         bot.say('Quiz is already running')
         return
 
-    bot.say('Quiz started by')
+    bot.say('Quiz started by {}'.format(trigger.nick))
     bot.memory['quiz'] = Quiz()
     bot.say(bot.memory['quiz'].get_question())
 
@@ -137,9 +137,11 @@ def handle_quiz(bot, trigger):
     quiz = bot.memory['quiz']
     answer = quiz.question.answer
     if quiz.attempt(trigger.args[1], trigger.nick):
-        bot.say('Correct! The answer was {}'.format(answer))
-
         scores = bot.memory['quiz'].get_scores()
+
+        bot.say('Correct! The answer was {}'.format(answer))
+        bot.say('{} has {} points!'.format(trigger.nick, scores[trigger.nick]))
+
         tens = [i for i in scores if scores[i] == 10]
         if tens:
             bot.say('{} is the winner!'.format(tens[0]))
