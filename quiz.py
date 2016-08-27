@@ -3,6 +3,7 @@
 import requests
 from sopel.module import commands, rule
 import re
+from threading import Timer
 
 
 class Question():
@@ -87,6 +88,8 @@ def quiz(bot, trigger):
     bot.say('Quiz started by {}'.format(trigger.nick))
     bot.memory['quiz'] = Quiz()
     bot.say(bot.memory['quiz'].get_question())
+    bot.memory['qtimer'] = Timer(30, qtimeout, args=[bot])
+    bot.memory['qtimer'].start()
 
 
 @commands('qstop')
@@ -124,10 +127,34 @@ def qskip(bot, trigger):
         bot.say('No quiz running!')
         return
 
-    answer = bot.memory['quiz'].question.answer
-    bot.say('Fine, the answer was {}'.format(answer))
-    bot.memory['quiz'].next_question()
-    bot.say(bot.memory['quiz'].get_question())
+    quiz = bot.memory['quiz']
+    bot.say('Fine, the answer was {}'.format(quiz.question.answer))
+
+    quiz.next_question()
+    bot.say(quiz.get_question())
+    reset_timer(bot)
+
+
+def qtimeout(bot):
+    if not bot.memory['quiz']:
+        return
+
+    quiz = bot.memory['quiz']
+    bot.say('No answer within 30 seconds. The answer was {}'.format(quiz.question.answer))
+
+    if not quiz.qno % 10:
+        qscores(bot, trigger)
+
+    quiz.next_question()
+    bot.say(quiz.get_question())
+    reset_timer(bot)
+
+
+def reset_timer(bot):
+    #  t = bot.memory['qtimer']
+    bot.memory['qtimer'].cancel()
+    bot.memory['qtimer'] = Timer(30, qtimeout, args=[bot])
+    bot.memory['qtimer'].start()
 
 
 @rule('[^\.].*')
@@ -154,6 +181,7 @@ def handle_quiz(bot, trigger):
 
         quiz.next_question()
         bot.say(bot.memory['quiz'].get_question())
+        reset_timer(bot)
 
 
 if __name__ == "__main__":
