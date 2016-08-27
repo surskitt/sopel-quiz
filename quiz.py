@@ -98,7 +98,7 @@ def qstop(bot, trigger):
         bot.say('No quiz running!')
         return
 
-    bot.say('Stopping quiz')
+    bot.say('Quiz stopped by {}'.format(trigger.nick))
     bot.memory['quiz'] = None
 
 
