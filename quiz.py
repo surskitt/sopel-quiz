@@ -140,7 +140,8 @@ def handle_quiz(bot, trigger):
         bot.say('Correct! The answer was {}'.format(quiz.question.answer))
         quiz.award_user(trigger.nick)
         score = bot.memory['quiz'].get_scores()[trigger.nick]
-        bot.say('{} has {} point{}!'.format(trigger.nick, score, 's' * (score > 1)))
+        bot.say('{} has {} point{}!'.format(trigger.nick, score,
+                                            's' * (score > 1)))
 
         if score == 10:
             bot.say('{} is the winner!'.format(trigger.nick))
