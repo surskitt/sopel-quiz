@@ -100,6 +100,7 @@ def qstop(bot, trigger):
 
     bot.say('Quiz stopped by {}'.format(trigger.nick))
     bot.memory['quiz'] = None
+    bot.memory['qtimer'].cancel()
 
 
 @commands('qscores')
