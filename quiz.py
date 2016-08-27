@@ -7,6 +7,15 @@ from threading import Timer
 from time import sleep
 
 
+def setup(bot):
+    bot.memory['quiz'] = None
+
+
+def shutdown(bot):
+    if bot.memory.contains('qtimer'):
+        bot.memory['qtimer'].cancel()
+
+
 class Question():
     def __init__(self):
         r = requests.get('http://jservice.io/api/random')
@@ -60,10 +69,6 @@ class Quiz():
         return self.scores
 
 
-def setup(bot):
-    bot.memory['quiz'] = None
-
-
 @commands('quiz')
 def quiz(bot, trigger):
     if bot.memory['quiz']:
@@ -71,6 +76,7 @@ def quiz(bot, trigger):
         return
 
     bot.say('Quiz started by {}'.format(trigger.nick))
+
     bot.memory['quiz'] = Quiz()
     bot.say(bot.memory['quiz'].get_question())
     bot.memory['qtimer'] = Timer(30, qtimeout, args=[bot])
