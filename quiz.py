@@ -55,9 +55,6 @@ class Quiz():
         self.qno += 1
         self.question = Question()
 
-    def attempt(self, attempt, user):
-        return self.question.attempt(attempt)
-
     def get_scores(self):
         return self.scores
 
