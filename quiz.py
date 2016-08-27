@@ -103,7 +103,7 @@ def qstop(bot, trigger):
 
 
 @commands('qscores')
-def qscores(bot, trigger):
+def qscores(bot, trigger=None):
     if not bot.memory['quiz']:
         bot.say('No quiz running!')
         return
@@ -144,7 +144,7 @@ def qtimeout(bot):
     bot.say('The answer was {}'.format(quiz.question.answer))
 
     if not quiz.qno % 10:
-        qscores(bot, trigger)
+        qscores(bot)
 
     quiz.next_question()
     bot.say(quiz.get_question())
@@ -173,12 +173,12 @@ def handle_quiz(bot, trigger):
 
         if score == 10:
             bot.say('{} is the winner!'.format(trigger.nick))
-            qscores(bot, trigger)
+            qscores(bot)
             bot.memory['quiz'] = None
             return
 
         if not quiz.qno % 10:
-            qscores(bot, trigger)
+            qscores(bot)
 
         quiz.next_question()
         bot.say(bot.memory['quiz'].get_question())
