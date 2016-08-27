@@ -28,7 +28,7 @@ class Question():
     def parse_answer(self, answer):
         # strip extraneous characters, making the question easier to answer
         # - a, an and the from the beginning
-        answer = re.sub(r'^(the|a|an) |"', '', answer)
+        answer = re.sub(r'^(the|a|an) |"| \(.*\) ', '', answer)
         return answer.lower()
 
     def attempt(self, attempt):
@@ -62,12 +62,13 @@ class Quiz():
         self.question = Question()
 
     def attempt(self, attempt, user):
-        if self.question.attempt(attempt):
-            self.award_user(user)
-            self.next_question()
-            return True
-        else:
-            return False
+        #  if self.question.attempt(attempt):
+            #  self.award_user(user)
+            #  self.next_question()
+            #  return True
+        #  else:
+            #  return False
+        return self.question.attempt(attempt)
 
     def get_scores(self):
         return self.scores
@@ -135,13 +136,11 @@ def handle_quiz(bot, trigger):
         return
 
     quiz = bot.memory['quiz']
-    answer = quiz.question.answer
-    if quiz.attempt(trigger.args[1], trigger.nick):
+    if quiz.question.attempt(trigger.args[1]):
+        bot.say('Correct! The answer was {}'.format(quiz.question.answer))
+        quiz.award_user(trigger.nick)
         score = bot.memory['quiz'].get_scores()[trigger.nick]
-
-        bot.say('Correct! The answer was {}'.format(answer))
-        bot.say('{} has {} point{}!'.format(trigger.nick, score,
-                                            's' * (score != 1)))
+        bot.say('{} has {} point{}!'.format(trigger.nick, score, 's' * (score > 1)))
 
         if score == 10:
             bot.say('{} is the winner!'.format(trigger.nick))
@@ -152,6 +151,7 @@ def handle_quiz(bot, trigger):
         if not quiz.qno % 10:
             qscores(bot, trigger)
 
+        quiz.next_question()
         bot.say(bot.memory['quiz'].get_question())
 
 
