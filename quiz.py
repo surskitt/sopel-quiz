@@ -143,10 +143,10 @@ def reset_timer(bot):
 
 
 def next_q(bot):
-    if not quiz.qno % 10:
+    if not bot.memory['quiz'].qno % 10:
         qscores(bot)
 
-    quiz.next_question()
+    bot.memory['quiz'].next_question()
     sleep(5)
     bot.say(bot.memory['quiz'].get_question())
     reset_timer(bot)
