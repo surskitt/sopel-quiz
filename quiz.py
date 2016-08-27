@@ -40,14 +40,7 @@ class Quiz():
     def __init__(self):
         self.scores = {}
         self.qno = 0
-        # self.question = None
         self.next_question()
-
-    # def start(self):
-        # pass
-
-    def stop(self):
-        pass
 
     def get_question(self):
         return 'Question {}: {}'.format(self.qno, self.question.get_question())
@@ -63,12 +56,6 @@ class Quiz():
         self.question = Question()
 
     def attempt(self, attempt, user):
-        #  if self.question.attempt(attempt):
-            #  self.award_user(user)
-            #  self.next_question()
-            #  return True
-        #  else:
-            #  return False
         return self.question.attempt(attempt)
 
     def get_scores(self):
@@ -153,7 +140,6 @@ def qtimeout(bot):
 
 
 def reset_timer(bot):
-    #  t = bot.memory['qtimer']
     bot.memory['qtimer'].cancel()
     bot.memory['qtimer'] = Timer(30, qtimeout, args=[bot])
     bot.memory['qtimer'].start()
@@ -190,7 +176,6 @@ if __name__ == "__main__":
     q = Question()
     print(q.get_question())
     attempt = input('Answer: ')
-    # if attempt.lower() in q.checked_answer.lower():
     if q.attempt(attempt):
         print('Correct! The answer was {}'.format(q.answer))
     else:
