@@ -33,7 +33,8 @@ class Question():
     def strip_answer(self, answer):
         # strip any crap that should never be printed
         # - html tags
-        answer = re.sub(r'\<.*?\>', '', answer)
+        # - \'
+        answer = re.sub(r'\<.*?\>|\\(?=\')', '', answer)
         return answer
 
     def parse_answer(self, answer):
