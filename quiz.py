@@ -39,7 +39,7 @@ class Question():
     def parse_answer(self, answer):
         # strip extraneous characters, making the question easier to answer
         # - a, an and the from the beginning
-        answer = re.sub(r'^(the|a|an) |"| \(.*\) ', '', answer)
+        answer = re.sub(r'^(the|a|an) |"| ?\(.*\) ?', '', answer)
         return answer.lower()
 
     def attempt(self, attempt):
