@@ -40,6 +40,8 @@ class Question():
     def parse_answer(self, answer):
         # strip extraneous characters, making the question easier to answer
         # - a, an and the from the beginning
+        # - quotes
+        # - parenthesised sections
         answer = re.sub(r'^(the|a|an) |"| ?\(.*\) ?', '', answer)
         return answer.lower()
 
