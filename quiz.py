@@ -113,6 +113,22 @@ def qscores(bot, trigger=None):
         bot.say('{}: {} point{}'.format(quizzer, score, 's' * (score != 1)))
 
 
+def reset_timer(bot):
+    bot.memory['qtimer'].cancel()
+    bot.memory['qtimer'] = Timer(30, qtimeout, args=[bot])
+    bot.memory['qtimer'].start()
+
+
+def next_q(bot):
+    if not bot.memory['quiz'].qno % 10:
+        qscores(bot)
+
+    bot.memory['quiz'].next_question()
+    sleep(5)
+    bot.say(bot.memory['quiz'].get_question())
+    reset_timer(bot)
+
+
 @commands('qskip')
 def qskip(bot, trigger):
     if not bot.memory['quiz']:
@@ -134,22 +150,6 @@ def qtimeout(bot):
     bot.say('No answer within 30 seconds. The answer was {}'.format(answer))
 
     next_q(bot)
-
-
-def reset_timer(bot):
-    bot.memory['qtimer'].cancel()
-    bot.memory['qtimer'] = Timer(30, qtimeout, args=[bot])
-    bot.memory['qtimer'].start()
-
-
-def next_q(bot):
-    if not bot.memory['quiz'].qno % 10:
-        qscores(bot)
-
-    bot.memory['quiz'].next_question()
-    sleep(5)
-    bot.say(bot.memory['quiz'].get_question())
-    reset_timer(bot)
 
 
 @rule('[^\.].*')
