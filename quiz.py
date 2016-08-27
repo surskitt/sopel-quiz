@@ -140,8 +140,8 @@ def qtimeout(bot):
         return
 
     quiz = bot.memory['quiz']
-    bot.say('No answer within 30 seconds.')
-    bot.say('The answer was {}'.format(quiz.question.answer))
+    answer = quiz.question.answer
+    bot.say('No answer within 30 seconds. The answer was {}'.format(answer))
 
     if not quiz.qno % 10:
         qscores(bot)
