@@ -4,6 +4,7 @@ import requests
 from sopel.module import commands, rule
 import re
 from threading import Timer
+from time import sleep
 
 
 class Question():
@@ -115,9 +116,7 @@ def qskip(bot, trigger):
     quiz = bot.memory['quiz']
     bot.say('Fine, the answer was {}'.format(quiz.question.answer))
 
-    quiz.next_question()
-    bot.say(quiz.get_question())
-    reset_timer(bot)
+    next_q(bot)
 
 
 def qtimeout(bot):
@@ -128,18 +127,23 @@ def qtimeout(bot):
     answer = quiz.question.answer
     bot.say('No answer within 30 seconds. The answer was {}'.format(answer))
 
-    if not quiz.qno % 10:
-        qscores(bot)
-
-    quiz.next_question()
-    bot.say(quiz.get_question())
-    reset_timer(bot)
+    next_q(bot)
 
 
 def reset_timer(bot):
     bot.memory['qtimer'].cancel()
     bot.memory['qtimer'] = Timer(30, qtimeout, args=[bot])
     bot.memory['qtimer'].start()
+
+
+def next_q(bot):
+    if not quiz.qno % 10:
+        qscores(bot)
+
+    quiz.next_question()
+    sleep(5)
+    bot.say(bot.memory['quiz'].get_question())
+    reset_timer(bot)
 
 
 @rule('[^\.].*')
@@ -161,12 +165,7 @@ def handle_quiz(bot, trigger):
             bot.memory['quiz'] = None
             return
 
-        if not quiz.qno % 10:
-            qscores(bot)
-
-        quiz.next_question()
-        bot.say(bot.memory['quiz'].get_question())
-        reset_timer(bot)
+        next_q(bot)
 
 
 if __name__ == "__main__":
