@@ -2,13 +2,25 @@
 
 import requests
 from sopel.module import commands, rule
+from sopel.config.types import StaticSection, ValidatedAttribute
 import re
 from threading import Timer
 from time import sleep
 
 
+class QuizSection(StaticSection):
+    points_to_win = ValidatedAttribute('points_to_win', int, default=10)
+
+
 def setup(bot):
+    bot.config.define_section('quiz', QuizSection)
     bot.memory['quiz'] = None
+
+
+def configure(config):
+    config.define_section('quiz', QuizSection, validate=False)
+    config.quiz.configure_setting('points_to_win',
+                                  'How many points are needed to win?')
 
 
 def shutdown(bot):
@@ -79,6 +91,7 @@ def quiz(bot, trigger):
         return
 
     bot.say('Quiz started by {}'.format(trigger.nick))
+    bot.say('First to {} points wins!'.format(bot.config.quiz.win))
 
     bot.memory['quiz'] = Quiz()
     bot.say(bot.memory['quiz'].get_question())
@@ -168,7 +181,7 @@ def handle_quiz(bot, trigger):
         bot.say('{} has {} point{}!'.format(trigger.nick, score,
                                             's' * (score > 1)))
 
-        if score == 10:
+        if score == bot.config.quiz.points_to_win:
             bot.say('{} is the winner!'.format(trigger.nick))
             qscores(bot)
             bot.memory['quiz'] = None
