@@ -2,14 +2,18 @@
 
 import requests
 from sopel.module import commands, rule
-from sopel.config.types import StaticSection, ValidatedAttribute
+from sopel.config.types import (StaticSection, ValidatedAttribute,
+                                ChoiceAttribute)
 import re
 from threading import Timer
 from time import sleep
 
 
 class QuizSection(StaticSection):
+    win_method = ChoiceAttribute('win_method', ['points', 'score'],
+                                 default='points')
     points_to_win = ValidatedAttribute('points_to_win', int, default=10)
+    score_to_win = ValidatedAttribute('score_to_win', int, default=7000)
 
 
 def setup(bot):
@@ -19,8 +23,13 @@ def setup(bot):
 
 def configure(config):
     config.define_section('quiz', QuizSection, validate=False)
-    config.quiz.configure_setting('points_to_win',
-                                  'How many points are needed to win?')
+    config.quiz.configure_setting('win_method', 'Win by points or score?')
+    if config.quiz.win_method == 'points':
+        config.quiz.configure_setting('points_to_win',
+                                      'How many points are needed to win?')
+    else:
+        config.quiz.configure_setting('score_to_win',
+                                      'What score is needed to win?')
 
 
 def shutdown(bot):
@@ -36,7 +45,7 @@ class Question():
         self.answer = self.strip_answer(q_json['answer'])
         self.checked_answer = self.parse_answer(self.answer)
         self.category = q_json['category']['title']
-        self.value = q_json['value']
+        self.value = q_json['value'] or 100
 
     def get_question(self):
         q, c, v = self.question, self.category, self.value
@@ -70,11 +79,11 @@ class Quiz():
     def get_question(self):
         return 'Question {}: {}'.format(self.qno, self.question.get_question())
 
-    def award_user(self, user):
+    def award_user(self, user, count):
         if user not in self.scores:
-            self.scores[user] = 1
+            self.scores[user] = count
         else:
-            self.scores[user] += 1
+            self.scores[user] += count
 
     def next_question(self):
         self.qno += 1
@@ -91,7 +100,12 @@ def quiz(bot, trigger):
         return
 
     bot.say('Quiz started by {}'.format(trigger.nick))
-    bot.say('First to {} points wins!'.format(bot.config.quiz.win))
+    if bot.config.quiz.win_method == 'points':
+        win_value = bot.config.quiz.points_to_win
+        bot.say('First to answer {} questions wins!'.format(win_value))
+    else:
+        win_value = bot.config.quiz.score_to_win
+        bot.say('First to {} points wins!'.format(win_value))
 
     bot.memory['quiz'] = Quiz()
     bot.say(bot.memory['quiz'].get_question())
@@ -176,12 +190,17 @@ def handle_quiz(bot, trigger):
     quiz = bot.memory['quiz']
     if quiz.question.attempt(trigger.args[1]):
         bot.say('Correct! The answer was {}'.format(quiz.question.answer))
-        quiz.award_user(trigger.nick)
+        quiz.award_user(trigger.nick, quiz.question.value
+                        if bot.config.quiz.win_method == 'score' else 1)
         score = bot.memory['quiz'].get_scores()[trigger.nick]
         bot.say('{} has {} point{}!'.format(trigger.nick, score,
                                             's' * (score > 1)))
 
-        if score == bot.config.quiz.points_to_win:
+        if bot.config.quiz.win_method == 'points':
+            win_value = bot.config.quiz.points_to_win
+        else:
+            win_value = bot.config.quiz.score_to_win
+        if score >= win_value:
             bot.say('{} is the winner!'.format(trigger.nick))
             qscores(bot)
             bot.memory['quiz'] = None
