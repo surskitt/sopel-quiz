@@ -175,13 +175,3 @@ def handle_quiz(bot, trigger):
             return
 
         next_q(bot)
-
-
-if __name__ == "__main__":
-    q = Question()
-    print(q.get_question())
-    attempt = input('Answer: ')
-    if q.attempt(attempt):
-        print('Correct! The answer was {}'.format(q.answer))
-    else:
-        print('Nope! The answer was {}'.format(q.answer))
