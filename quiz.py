@@ -3,7 +3,8 @@
 import requests
 from sopel.module import commands, rule
 from sopel.config.types import (StaticSection, ValidatedAttribute,
-                                ChoiceAttribute)
+                                ChoiceAttribute, ListAttribute)
+from sopel.db import SopelDB
 import re
 from threading import Timer
 from time import sleep
@@ -14,6 +15,7 @@ class QuizSection(StaticSection):
                                  default='points')
     points_to_win = ValidatedAttribute('points_to_win', int, default=10)
     score_to_win = ValidatedAttribute('score_to_win', int, default=7000)
+    db_users = ListAttribute('db_users')
 
 
 def setup(bot):
@@ -30,6 +32,8 @@ def configure(config):
     else:
         config.quiz.configure_setting('score_to_win',
                                       'What score is needed to win?')
+    config.quiz.configure_setting('db_users',
+                                  'Which users can start tracked quizzes?')
 
 
 def shutdown(bot):
@@ -71,10 +75,11 @@ class Question():
 
 
 class Quiz():
-    def __init__(self):
+    def __init__(self, starter):
         self.scores = {}
         self.qno = 0
         self.next_question()
+        self.starter = starter
 
     def get_question(self):
         return 'Question {}: {}'.format(self.qno, self.question.get_question())
@@ -107,7 +112,7 @@ def quiz(bot, trigger):
         win_value = bot.config.quiz.score_to_win
         bot.say('First to {} points wins!'.format(win_value))
 
-    bot.memory['quiz'] = Quiz()
+    bot.memory['quiz'] = Quiz(trigger.nick)
     bot.say(bot.memory['quiz'].get_question())
     bot.memory['qtimer'] = Timer(30, qtimeout, args=[bot])
     bot.memory['qtimer'].start()
@@ -141,6 +146,20 @@ def qscores(bot, trigger=None):
     for quizzer, score in scores:
         score = int(score)
         bot.say('{}: {} point{}'.format(quizzer, score, 's' * (score != 1)))
+
+
+@commands('qwins')
+def qwins(bot, trigger):
+    db = SopelDB(bot.config)
+
+    out = db.execute('SELECT slug, value from nicknames JOIN nick_values '
+                     'ON nicknames.nick_id = nick_values.nick_id '
+                     'WHERE key = ?',
+                     ['quiz_wins']).fetchall()
+
+    bot.say('Overall quiz win counts')
+    for user, count in sorted(out, key=lambda x: x[1], reverse=True):
+        bot.say('{}: {}'.format(user, count))
 
 
 def reset_timer(bot):
@@ -203,6 +222,15 @@ def handle_quiz(bot, trigger):
         if score >= win_value:
             bot.say('{} is the winner!'.format(trigger.nick))
             qscores(bot)
+
+            db = SopelDB(bot.config)
+            db_users = bot.config.quiz.db_users
+            if not db_users or quiz.starter in db_users:
+                wins = (db.get_nick_value('Shane', 'quiz_wins') or 0) + 1
+                db.set_nick_value('Shane', 'quiz_wins', wins)
+                bot.say('{} has won {} time{}'.format(trigger.nick, wins,
+                                                      's' * (wins > 1)))
+
             bot.memory['quiz'] = None
             return
 
