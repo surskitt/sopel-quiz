@@ -152,14 +152,17 @@ def qscores(bot, trigger=None):
 def qwins(bot, trigger):
     db = SopelDB(bot.config)
 
-    out = db.execute('SELECT slug, value from nicknames JOIN nick_values '
-                     'ON nicknames.nick_id = nick_values.nick_id '
-                     'WHERE key = ?',
-                     ['quiz_wins']).fetchall()
+    winners = db.execute('SELECT slug, value from nicknames JOIN nick_values '
+                         'ON nicknames.nick_id = nick_values.nick_id '
+                         'WHERE key = ?',
+                         ['quiz_wins']).fetchall()
 
-    bot.say('Overall quiz win counts')
-    for user, count in sorted(out, key=lambda x: x[1], reverse=True):
-        bot.say('{}: {}'.format(user, count))
+    if winners:
+        bot.say('Overall quiz win counts')
+        for user, count in sorted(winners, key=lambda x: x[1], reverse=True):
+            bot.say('{}: {}'.format(user, count))
+    else:
+        bot.say('No one has won yet!')
 
 
 def reset_timer(bot):
