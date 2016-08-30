@@ -153,10 +153,11 @@ def qscores(bot, trigger=None):
 def qwins(bot, trigger):
     db = SopelDB(bot.config)
 
-    winners = db.execute('SELECT slug, value from nicknames JOIN nick_values '
-                         'ON nicknames.nick_id = nick_values.nick_id '
-                         'WHERE key = ?',
-                         ['quiz_wins']).fetchall()
+    winners = db.execute(
+        'SELECT canonical, value from nicknames JOIN nick_values '
+        'ON nicknames.nick_id = nick_values.nick_id '
+        'WHERE key = ?',
+        ['quiz_wins']).fetchall()
 
     if winners:
         bot.say('Overall quiz win counts')
@@ -231,8 +232,8 @@ def handle_quiz(bot, trigger):
             db = SopelDB(bot.config)
             db_users = bot.config.quiz.db_users
             if not db_users or quiz.starter in db_users:
-                wins = (db.get_nick_value('Shane', 'quiz_wins') or 0) + 1
-                db.set_nick_value('Shane', 'quiz_wins', wins)
+                wins = (db.get_nick_value(trigger.nick, 'quiz_wins') or 0) + 1
+                db.set_nick_value(trigger.nick, 'quiz_wins', wins)
                 bot.say('{} has won {} time{}'.format(trigger.nick, wins,
                                                       's' * (wins > 1)))
 
