@@ -50,6 +50,7 @@ class Question():
         self.checked_answer = self.parse_answer(self.answer)
         self.category = q_json['category']['title']
         self.value = q_json['value'] or 100
+        self.answered = False
 
     def get_question(self):
         q, c, v = self.question, self.category, self.value
@@ -210,7 +211,8 @@ def handle_quiz(bot, trigger):
         return
 
     quiz = bot.memory['quiz']
-    if quiz.question.attempt(trigger.args[1]):
+    if quiz.question.attempt(trigger.args[1]) and not quiz.question.answered:
+        quiz.question.answered = True
         bot.say('Correct! The answer was {}'.format(quiz.question.answer))
         quiz.award_user(trigger.nick, quiz.question.value
                         if bot.config.quiz.win_method == 'score' else 1)
