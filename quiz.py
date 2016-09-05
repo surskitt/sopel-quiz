@@ -68,7 +68,8 @@ class Question():
         # - a, an and the from the beginning
         # - quotes
         # - parenthesised sections
-        answer = re.sub(r'^(the|a|an) |"| ?\(.*\) ?|s$', '', answer)
+        answer = re.sub(r'^(the|a|an) |"| ?\(.*\) ?|s$|', '', answer)
+        answer = re.sub(r'&', 'and', answer)
         return answer.lower()
 
     def attempt(self, attempt):
