@@ -51,6 +51,7 @@ class Question():
         self.category = q_json['category']['title']
         self.value = q_json['value'] or 100
         self.answered = False
+        r.close()
 
     def get_question(self):
         q, c, v = self.question, self.category, self.value
