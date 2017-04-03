@@ -5,6 +5,7 @@ from sopel.module import commands, rule
 from sopel.config.types import (StaticSection, ValidatedAttribute,
                                 ChoiceAttribute, ListAttribute)
 from sopel.db import SopelDB
+from sopel.formatting import colors, color
 import re
 from threading import Timer
 from time import sleep
@@ -217,7 +218,8 @@ def handle_quiz(bot, trigger):
     quiz = bot.memory['quiz']
     if quiz.question.attempt(trigger.args[1]) and not quiz.question.answered:
         quiz.question.answered = True
-        bot.say('Correct! The answer was {}'.format(quiz.question.answer))
+        bot.say(color('Correct! The answer was {}'.format(quiz.question.answer),
+                      colors.GREEN))
         quiz.award_user(trigger.nick, quiz.question.value
                         if bot.config.quiz.win_method == 'score' else 1)
         score = bot.memory['quiz'].get_scores()[trigger.nick]
