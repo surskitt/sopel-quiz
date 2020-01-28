@@ -1,0 +1,28 @@
+version: '3'
+
+services:
+  ircd:
+    image: inspircd/inspircd-docker
+    container_name: ircd
+
+  sopel:
+    image: sopelirc/sopel
+    container_name: sopel
+    volumes:
+      - ./docker_test_config/sopel.cfg:/home/sopel/.sopel/default.cfg
+      - ./sopel_modules/quiz/quiz.py:/home/sopel/.sopel/modules/quiz.py
+    depends_on:
+      - ircd
+
+  weechat:
+    image: jkaberg/weechat
+    container_name: weechat
+    stdin_open: true
+    tty: true
+    environment:
+      - 'UID=1000'
+      - 'GID=1000'
+    volumes:
+      - ./docker_test_config/weechat_irc.conf:/weechat/.weechat/irc.conf
+    depends_on:
+      - ircd
